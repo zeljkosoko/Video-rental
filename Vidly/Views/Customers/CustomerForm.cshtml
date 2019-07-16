@@ -1,0 +1,52 @@
+﻿@model Vidly.ViewModels.CustomerFormViewModel
+
+@{
+    ViewBag.Title = "New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>New Customer</h2>
+
+@Html.ValidationSummary(true,"Please fix the following errors.")
+
+@using (Html.BeginForm("Save", "Customers"))
+{
+        @* hidden field dont show customerId of passed customer object*@
+    @Html.HiddenFor(mv => mv.Customer.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(mv => mv.Customer.Name)
+        @Html.TextBoxFor(mv => mv.Customer.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(mv => mv.Customer.Name)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(mv => mv.Customer.MembershipTypeId)
+        @* DropDown( for which model property is defined, select list obj(items, data value in item, data text in item), empty field, html attribute ) *@
+        @Html.DropDownListFor(mv => mv.Customer.MembershipTypeId, new SelectList(Model.MembershipTypes, "Id", "Name"), "Select type", new { @class = "form-control" })
+        @Html.ValidationMessageFor(mv => mv.Customer.MembershipTypeId)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(mv => mv.Customer.Birthdate)
+        @Html.TextBoxFor(mv => mv.Customer.Birthdate,"{0: d MMM yyyy}", new { @class = "form-control" })
+        @Html.ValidationMessageFor(mv => mv.Customer.Birthdate)
+    </div>
+  
+      <!--Used form in getbootstrap.com version 3!-->
+    <div class="checkbox">
+        <label>
+            @Html.CheckBoxFor(mv => mv.Customer.IsSubscribedToNewsletter) Subscribed to Newsletter?
+        </label>
+    </div>
+    /*Hidden field stores cookie with key on users computer and if user use our Form he will get this, else if he try
+    to pass the new customer without using our form he will not has the key for comparing with our server */
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">Save</button>
+}
+
+@* Client side Validation works only with standard data annotation not with Custom  *@
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

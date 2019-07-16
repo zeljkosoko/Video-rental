@@ -1,0 +1,106 @@
+﻿@model IEnumerable<Vidly.Models.Customer>
+@{
+    ViewBag.Title = "Customers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1 class="m-3">Customers</h1>
+@*@{
+    if (!Model.Any())
+    {
+        <p>There is no any customer.</p>
+    }
+    else
+    {
+       
+        <table id="customers" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Membership Type</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var customer in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.ActionLink(customer.Name, "Edit", new { id = customer.Id }, null)
+                            </td>
+                            <td>
+                                @customer.MembershipType.Name
+                            </td>
+                            <td>
+                                <button data-customer-id="@customer.Id" class="btn btn-link btn-delete">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+
+}*@
+
+<table id="customers" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Membership Type</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            //datatable accept {config object}, keeps the list of customer internaly
+            var customersTable = $("#customers").DataTable({
+                ajax: {
+                    url: "/api/customers",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function (data, type, customer) {
+                            return "<a href='/customers/edit/" + customer.id + "'>" + customer.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "membershipType.name"
+                    },
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return "<button class='btn-link js-delete' data-customer-id='" + data + "'>Delete</button>";
+                        }
+                    }
+                ]
+            });
+
+            $("#customers").on("click",".js-delete", function () {
+                var btnDelete = $(this);
+
+                bootbox.confirm("Are you sure you want to delete the customer: "+btnDelete.attr("data-customer-id"), function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/customers/" + btnDelete.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                                // remove predecessor TR that is no direct parent but parent's parent
+                                //btnDelete.parents("tr").remove();
+                                customersTable.row(btnDelete.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+
+            });
+        });
+    </script>       
+}

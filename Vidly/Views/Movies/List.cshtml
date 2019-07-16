@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Vidly.Models.Movie>
+@{
+    ViewBag.Title = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="my-3">Movies</h1>
+
+@Html.ActionLink("New movie", "New", null, new { @class="btn btn-primary my-3" })
+
+<table id="movies" class="table table-bordered table-hover my-2">
+    <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Genre</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>  
+    </tbody>
+</table>
+
+@section scripts {
+    
+    <script>
+        $(document).ready(function () {
+            //table calls dataTable to send ajax request to API for data
+            var moviesDT = $("#movies").DataTable({
+                ajax:{
+                    url: "/api/movies",
+                    dataSrc:""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function (data, type, movie) {
+                            return "<a href='/movies/edit/" + movie.id + "'>" + movie.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "genre.name",
+
+                    },
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return "<button class='btn-link movie-delete' data-movie-id='" + data + "'>Delete</button>";
+                        }
+                    }
+                ]
+                    
+            });
+       
+            //movie-delete button click
+            $("#movies").on("click", ".movie-delete", function () {
+                var button = $(this);
+                bootbox.confirm("Are you sure you want to delete the movie?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/movies/" + button.attr("data-movie-id"),
+                            method: "DELETE",
+                            success: function () {
+                              moviesDT.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+
+                }); 
+                    
+               
+                
+            });
+        });
+    </script>    
+}
+
+
+
+
+
+
+

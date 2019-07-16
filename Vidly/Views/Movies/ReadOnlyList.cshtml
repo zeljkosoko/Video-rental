@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Vidly.Models.Movie>
+@{
+    ViewBag.Title = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="my-3">Movies</h1>
+
+@* ....................This view is for the guest user which cannot Add new, edit and delete the movie.............. *@
+
+<table id="movies" class="table table-bordered table-hover my-2">
+    <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Genre</th>
+        </tr>
+    </thead>
+    <tbody>  
+    </tbody>
+</table>
+
+@section scripts {
+    
+    <script>
+        $(document).ready(function () {
+            //table calls dataTable to send ajax request to API for data
+            var moviesDT = $("#movies").DataTable({
+                ajax:{
+                    url: "/api/movies",
+                    dataSrc:""
+                },
+                columns: [
+                    {
+                        data: "name"
+                    },
+                    {
+                        data: "genre.name"
+
+                    }
+                ]
+                    
+            });
+        });
+    </script>    
+}
+
+
+
+
+
+
+
